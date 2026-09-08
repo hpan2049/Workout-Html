@@ -1,0 +1,720 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  #awt-root {
+    --bg: #14171c;
+    --surface: #1e232b;
+    --surface-2: #262c36;
+    --border: #323a46;
+    --text: #eceff3;
+    --text-muted: #8a93a3;
+    --accent: #e2a73e;
+    --accent-ink: #14171c;
+    --accent-soft: rgba(226,167,62,0.14);
+    --good: #6fae8c;
+    --bad: #c97064;
+
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #awt-root * { box-sizing: border-box; }
+
+  #awt-root .awt-header {
+    padding: 20px 18px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #awt-root h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  #awt-root .awt-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin: 0 0 14px;
+    line-height: 1.4;
+  }
+
+  #awt-root .awt-week {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  #awt-root .awt-week-day {
+    flex: 0 0 auto;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 6px 9px;
+    text-align: center;
+    line-height: 1.3;
+    min-width: 54px;
+  }
+
+  #awt-root .awt-week-day b {
+    display: block;
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  #awt-root .awt-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  #awt-root .awt-tab {
+    flex: 1;
+    background: var(--surface-2);
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 10px 4px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  #awt-root .awt-tab.active {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  #awt-root .awt-tip {
+    margin: 14px 18px 0;
+    background: var(--accent-soft);
+    border: 1px solid rgba(226,167,62,0.35);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  #awt-root .awt-list {
+    padding: 14px 18px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  #awt-root .awt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+  }
+
+  #awt-root .awt-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  #awt-root .awt-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  #awt-root .awt-target {
+    color: var(--text-muted);
+    font-size: 12.5px;
+    margin-top: 2px;
+  }
+
+  #awt-root .awt-form-link {
+    flex: 0 0 auto;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid rgba(226,167,62,0.5);
+    border-radius: 8px;
+    padding: 6px 9px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  #awt-root .awt-log-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  #awt-root .awt-input {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13.5px;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+  }
+
+  #awt-root .awt-input::placeholder { color: var(--text-muted); }
+
+  #awt-root .awt-log-btn {
+    flex: 0 0 auto;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    border-radius: 8px;
+    padding: 0 16px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  #awt-root .awt-history {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  #awt-root .awt-history-toggle {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  #awt-root .awt-history-list {
+    margin-top: 8px;
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  #awt-root .awt-history-list.open { display: flex; }
+
+  #awt-root .awt-history-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  #awt-root .awt-history-row .awt-delta-up { color: var(--good); }
+  #awt-root .awt-history-row .awt-delta-down { color: var(--bad); }
+
+  #awt-root .awt-empty-hist {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  #awt-root .awt-rec {
+    margin-top: 10px;
+    background: var(--surface-2);
+    border-left: 2px solid var(--accent);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  #awt-root .awt-loading {
+    padding: 40px 18px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  #awt-root .awt-home {
+    padding: 4px 18px 24px;
+  }
+
+  #awt-root .awt-encourage {
+    background: var(--accent-soft);
+    border: 1px solid rgba(226,167,62,0.35);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  #awt-root .awt-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  #awt-root .awt-cal-nav {
+    background: var(--surface-2);
+    border: none;
+    color: var(--text);
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  #awt-root .awt-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+  }
+
+  #awt-root .awt-cal-weekdays {
+    margin-bottom: 4px;
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+
+  #awt-root .awt-cal-cell {
+    padding: 7px 0;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    border: 1.5px solid transparent;
+  }
+
+  #awt-root .awt-cal-logged {
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+
+  #awt-root .awt-cal-today {
+    border-color: var(--accent);
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  #awt-root .awt-start-btn {
+    width: 100%;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-top: 18px;
+    cursor: pointer;
+  }
+
+  #awt-root .awt-secondary-btn {
+    width: 100%;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 13px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  #awt-root .awt-back-row {
+    padding: 12px 18px 0;
+  }
+
+  #awt-root .awt-back-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+  }
+</style>
+
+<div id="awt-root">
+  <div class="awt-header">
+    <h1>Upper / Lower Plan</h1>
+    <p class="awt-sub">Log your working weight after each exercise — the app remembers your last session so you know when to add weight.</p>
+    <div class="awt-week" id="awt-week"></div>
+  </div>
+
+  <div id="awt-home-view" class="awt-home">
+    <div class="awt-loading">Loading her check-in…</div>
+  </div>
+
+  <div id="awt-workout-view" style="display:none;">
+    <div class="awt-back-row">
+      <button class="awt-back-btn" id="awt-back-btn">← Back to check-in</button>
+    </div>
+    <div class="awt-tabs" id="awt-tabs"></div>
+    <div class="awt-tip" id="awt-tip"></div>
+    <div class="awt-list" id="awt-list"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const DAYS = [
+    {
+      id: 'upperA', label: 'Upper A', weekTag: 'Day 1',
+      exercises: [
+        { id: 'bench-press', name: 'Flat Dumbbell or Barbell Bench Press', target: '3 x 8-10', gif: 'https://musclewiki.com/exercise/dumbbell-bench-press?model=f', step: 10 },
+        { id: 'cable-row', name: 'Seated Cable Row', target: '3 x 10-12', gif: 'https://musclewiki.com/exercise/machine-seated-cable-row?model=f', step: 5 },
+        { id: 'shoulder-press', name: 'Dumbbell Shoulder Press', target: '3 x 8-10', gif: 'https://musclewiki.com/exercise/dumbbell-overhead-press?model=f', step: 5 },
+        { id: 'lat-pulldown', name: 'Lat Pulldown', target: '3 x 10-12', gif: 'https://musclewiki.com/exercise/machine-pulldown?model=f', step: 5 },
+        { id: 'lateral-raise', name: 'Dumbbell Lateral Raise', target: '2 x 12-15', gif: 'https://musclewiki.com/exercise/dumbbell-lateral-raise?model=f', step: 2.5 },
+        { id: 'bicep-curl', name: 'Bicep Curl', target: '2 x 10-12', gif: 'https://musclewiki.com/exercise/dumbbell-curl?model=f', step: 2.5 },
+        { id: 'tricep-pushdown', name: 'Tricep Pushdown', target: '2 x 10-12', gif: 'https://musclewiki.com/exercise/cable-rope-pushdown?model=f', step: 2.5 }
+      ]
+    },
+    {
+      id: 'lowerA', label: 'Lower A', weekTag: 'Day 2',
+      exercises: [
+        { id: 'squat', name: 'Barbell or Goblet Squat', target: '3 x 8-10', gif: 'https://musclewiki.com/exercise/barbell-squat?model=f', step: 10 },
+        { id: 'rdl', name: 'Romanian Deadlift', target: '3 x 8-10', gif: 'https://musclewiki.com/exercise/barbell-romanian-deadlift?model=f', step: 10 },
+        { id: 'walking-lunge', name: 'Walking Lunges', target: '2 x 12/leg', gif: 'https://musclewiki.com/exercise/lunge-walking?model=f', step: 2.5 },
+        { id: 'leg-press', name: 'Leg Press', target: '2 x 10-12', gif: 'https://musclewiki.com/exercise/machine-leg-press?model=f', step: 5 },
+        { id: 'calf-raise-standing', name: 'Standing Calf Raise', target: '3 x 12-15', gif: 'https://musclewiki.com/exercise/machine-standing-calf-raises?model=f', step: 2.5 },
+        { id: 'core-a', name: 'Hanging Knee Raise or Plank', target: '2 x 12-15 / 30-45s', gif: 'https://musclewiki.com/exercise/hanging-knee-raises?model=f', step: 2.5 }
+      ]
+    },
+    {
+      id: 'upperB', label: 'Upper B', weekTag: 'Day 4',
+      exercises: [
+        { id: 'incline-press', name: 'Incline Dumbbell Press', target: '3 x 8-10', gif: 'https://musclewiki.com/exercise/dumbbell-incline-bench-press?model=f', step: 5 },
+        { id: 'single-arm-row', name: 'Single-Arm Dumbbell Row', target: '3 x 10-12/side', gif: 'https://musclewiki.com/exercise/dumbbell-single-arm-row?model=f', step: 5 },
+        { id: 'chest-fly', name: 'Machine Chest Fly or Push-Up', target: '2 x 12-15', gif: 'https://musclewiki.com/exercise/machine-pec-fly?model=f', step: 2.5 },
+        { id: 'face-pull', name: 'Face Pulls', target: '3 x 12-15', gif: 'https://musclewiki.com/exercise/machine-face-pulls?model=f', step: 2.5 },
+        { id: 'shrug', name: 'Dumbbell Shrugs', target: '2 x 12-15', gif: 'https://musclewiki.com/exercise/dumbbell-shrug?model=f', step: 5 },
+        { id: 'hammer-curl', name: 'Hammer Curl', target: '2 x 10-12', gif: 'https://musclewiki.com/exercise/dumbbell-hammer-curl?model=f', step: 2.5 },
+        { id: 'overhead-tricep', name: 'Overhead Tricep Extension', target: '2 x 10-12', gif: 'https://musclewiki.com/exercise/dumbbell-overhead-tricep-extension?model=f', step: 2.5 }
+      ]
+    },
+    {
+      id: 'lowerB', label: 'Lower B', weekTag: 'Day 5',
+      exercises: [
+        { id: 'deadlift', name: 'Deadlift (Conventional or Trap Bar)', target: '3 x 6-8', gif: 'https://musclewiki.com/exercise/barbell-deadlift?model=f', step: 10 },
+        { id: 'bulgarian-split-squat', name: 'Bulgarian Split Squat', target: '3 x 10/leg', gif: 'https://musclewiki.com/exercise/dumbbell-bulgarian-split-squat?model=f', step: 5 },
+        { id: 'hip-thrust', name: 'Hip Thrust', target: '3 x 10-12', gif: 'https://musclewiki.com/exercise/barbell-hip-thrust?model=f', step: 10 },
+        { id: 'leg-curl', name: 'Leg Curl', target: '2 x 12-15', gif: 'https://musclewiki.com/exercise/machine-hamstring-curl?model=f', step: 5 },
+        { id: 'calf-raise-seated', name: 'Seated Calf Raise', target: '3 x 12-15', gif: 'https://musclewiki.com/exercise/machine-seated-calf-raises?model=f', step: 2.5 },
+        { id: 'woodchop', name: 'Cable Woodchop or Side Plank', target: '2 x 12/side', gif: 'https://musclewiki.com/exercise/cable-wood-chopper?model=f', step: 2.5 }
+      ]
+    }
+  ];
+
+  const WEEK_STRIP = [
+    { d: 'Mon', t: 'Upper A' }, { d: 'Tue', t: 'Lower A' }, { d: 'Wed', t: 'Rest' },
+    { d: 'Thu', t: 'Upper B' }, { d: 'Fri', t: 'Lower B' }, { d: 'Sat', t: 'Walk' }, { d: 'Sun', t: 'Rest' }
+  ];
+
+  const state = { activeDay: 'upperA', logs: {}, view: 'home', calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1) };
+  const logKey = (exId) => 'log:' + exId;
+
+  const ENCOURAGEMENT = [
+    "Proud of you for building this into your week, Abby.",
+    "Every session is a little gift to your future self. Let's go.",
+    "You're stronger than you were last month — today just adds to it.",
+    "No pressure to be perfect today, just show up for yourself.",
+    "This is your time. Take it, and enjoy it.",
+    "Whatever kind of day it's been, this hour is yours.",
+    "You've got nothing to prove today — just keep being consistent.",
+    "So glad you're doing this for you."
+  ];
+
+  // Sun=0 ... Sat=6, matching JS Date.getDay()
+  const DAY_TYPE_BY_WEEKDAY = ['Rest', 'Upper A', 'Lower A', 'Rest', 'Upper B', 'Lower B', 'Walk'];
+  const TYPE_TO_DAY_ID = { 'Upper A': 'upperA', 'Lower A': 'lowerA', 'Upper B': 'upperB', 'Lower B': 'lowerB' };
+
+  function dayOfYear(d) {
+    const start = new Date(d.getFullYear(), 0, 1);
+    return Math.floor((d - start) / 86400000) + 1;
+  }
+
+  function todayStr() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  // Standalone hosting: uses the browser's own localStorage instead of
+  // Claude's artifact storage API, so logging works on any web host.
+  async function loadAllLogs() {
+    const allExercises = DAYS.flatMap(d => d.exercises);
+    allExercises.forEach(ex => {
+      try {
+        const raw = localStorage.getItem(logKey(ex.id));
+        state.logs[ex.id] = raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        state.logs[ex.id] = [];
+      }
+    });
+  }
+
+  async function saveLog(exId) {
+    try {
+      localStorage.setItem(logKey(exId), JSON.stringify(state.logs[exId]));
+    } catch (e) {
+      console.error('Could not save log', e);
+    }
+  }
+
+  function renderWeekStrip() {
+    const el = document.getElementById('awt-week');
+    el.innerHTML = WEEK_STRIP.map(w => `<div class="awt-week-day">${w.d}<b>${w.t}</b></div>`).join('');
+  }
+
+  function getAllLoggedDates() {
+    const set = new Set();
+    Object.values(state.logs).forEach(log => log.forEach(e => set.add(e.date)));
+    return set;
+  }
+
+  function buildCalendarHtml() {
+    const monthDate = state.calendarMonth;
+    const year = monthDate.getFullYear(), month = monthDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const startWeekday = firstDay.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const loggedSet = getAllLoggedDates();
+    const todayVal = todayStr();
+    const monthLabel = firstDay.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    let cells = '';
+    for (let i = 0; i < startWeekday; i++) cells += `<div class="awt-cal-cell"></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateObj = new Date(year, month, d);
+      const dateStr = dateObj.toISOString().slice(0, 10);
+      const isToday = dateStr === todayVal;
+      const hasLog = loggedSet.has(dateStr);
+      cells += `<div class="awt-cal-cell${isToday ? ' awt-cal-today' : ''}${hasLog ? ' awt-cal-logged' : ''}">${d}</div>`;
+    }
+
+    return `
+      <div class="awt-cal-header">
+        <button class="awt-cal-nav" data-dir="-1">‹</button>
+        <span>${monthLabel}</span>
+        <button class="awt-cal-nav" data-dir="1">›</button>
+      </div>
+      <div class="awt-cal-grid awt-cal-weekdays">
+        <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+      </div>
+      <div class="awt-cal-grid">${cells}</div>
+    `;
+  }
+
+  function renderHome() {
+    const el = document.getElementById('awt-home-view');
+    const today = new Date();
+    const dayType = DAY_TYPE_BY_WEEKDAY[today.getDay()];
+    const dayId = TYPE_TO_DAY_ID[dayType];
+    const quote = ENCOURAGEMENT[dayOfYear(today) % ENCOURAGEMENT.length];
+
+    const ctaHtml = dayId
+      ? `<button class="awt-start-btn" id="awt-start-btn" data-day="${dayId}">Start today's ${dayType}</button>`
+      : `<div class="awt-encourage" style="margin-top:16px; margin-bottom:0;">Today's a ${dayType.toLowerCase()} day — recovery is part of the plan too.</div>
+         <button class="awt-secondary-btn" id="awt-browse-btn">Browse a workout anyway</button>`;
+
+    el.innerHTML = `
+      <div class="awt-encourage">${quote}</div>
+      ${buildCalendarHtml()}
+      ${ctaHtml}
+    `;
+
+    el.querySelectorAll('.awt-cal-nav').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dir = parseInt(btn.getAttribute('data-dir'), 10);
+        state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() + dir, 1);
+        renderHome();
+      });
+    });
+
+    const startBtn = document.getElementById('awt-start-btn');
+    if (startBtn) {
+      startBtn.addEventListener('click', () => {
+        state.activeDay = startBtn.getAttribute('data-day');
+        showView('workout');
+      });
+    }
+    const browseBtn = document.getElementById('awt-browse-btn');
+    if (browseBtn) {
+      browseBtn.addEventListener('click', () => showView('workout'));
+    }
+  }
+
+  function showView(view) {
+    state.view = view;
+    document.getElementById('awt-home-view').style.display = view === 'home' ? 'block' : 'none';
+    document.getElementById('awt-workout-view').style.display = view === 'workout' ? 'block' : 'none';
+    if (view === 'home') {
+      renderHome();
+    } else {
+      renderTabs();
+      renderTip();
+      renderList();
+    }
+  }
+
+  function renderTabs() {
+    const el = document.getElementById('awt-tabs');
+    el.innerHTML = DAYS.map(d =>
+      `<button class="awt-tab${d.id === state.activeDay ? ' active' : ''}" data-day="${d.id}">${d.label}</button>`
+    ).join('');
+    el.querySelectorAll('.awt-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.activeDay = btn.getAttribute('data-day');
+        renderTabs();
+        renderTip();
+        renderList();
+      });
+    });
+  }
+
+  function renderTip() {
+    document.getElementById('awt-tip').textContent =
+      'Once every set hits the top of its rep range, add 5-10 lb next time and drop back to the bottom of the range. Every 4th week, cut sets by about a third as a deload.';
+  }
+
+  function historyRowsHtml(log) {
+    if (!log.length) return '<div class="awt-empty-hist">No sessions logged yet.</div>';
+    const rows = [...log].slice(-5).reverse().map((entry, idx, arr) => {
+      const prev = arr[idx + 1];
+      let delta = '';
+      if (prev) {
+        const diff = entry.weight - prev.weight;
+        if (diff > 0) delta = `<span class="awt-delta-up">+${diff} lb</span>`;
+        else if (diff < 0) delta = `<span class="awt-delta-down">${diff} lb</span>`;
+        else delta = `<span>even</span>`;
+      }
+      const repsTxt = entry.reps ? ` x ${entry.reps}` : '';
+      return `<div class="awt-history-row"><span>${entry.date}</span><span>${entry.weight} lb${repsTxt} ${delta}</span></div>`;
+    }).join('');
+    return `<div class="awt-history-list">${rows}</div>`;
+  }
+
+  // Pulls the top of the target rep range out of a string like "3 x 8-10" -> 10
+  function parseTopRep(targetStr) {
+    const match = targetStr.match(/(\d+)\s*-\s*(\d+)/);
+    if (match) return parseInt(match[2], 10);
+    const single = targetStr.match(/x\s*(\d+)/i);
+    return single ? parseInt(single[1], 10) : null;
+  }
+
+  // Recommends a weight for today based only on the last logged session and
+  // how long ago it was — no target curve, just a simple next-session call.
+  function recommend(log, step, targetStr) {
+    if (!log.length) {
+      return { text: `No sessions yet — start with a weight you can control for ${targetStr}, leaving 2 reps in the tank.`, weight: null };
+    }
+    const last = log[log.length - 1];
+    const daysSince = Math.floor((new Date(todayStr()) - new Date(last.date)) / 86400000);
+    const topRep = parseTopRep(targetStr);
+
+    if (daysSince > 10) {
+      return { text: `It's been ${daysSince} days — ease back in at ${last.weight} lb.`, weight: last.weight };
+    }
+    if (last.reps != null && topRep != null && last.reps >= topRep) {
+      const next = last.weight + step;
+      return { text: `Hit the top of her range last time — try ${next} lb today.`, weight: next };
+    }
+    return { text: `Stick with ${last.weight} lb and aim for a rep or two more before adding weight.`, weight: last.weight };
+  }
+
+  function renderList() {
+    const day = DAYS.find(d => d.id === state.activeDay);
+    const el = document.getElementById('awt-list');
+
+    el.innerHTML = day.exercises.map(ex => {
+      const log = state.logs[ex.id] || [];
+      const last = log[log.length - 1];
+      const lastTxt = last ? `Last: ${last.weight} lb${last.reps ? ' x ' + last.reps : ''} on ${last.date}` : 'No sessions logged yet';
+      const rec = recommend(log, ex.step, ex.target);
+
+      return `
+        <div class="awt-card" data-ex="${ex.id}">
+          <div class="awt-card-top">
+            <div>
+              <div class="awt-name">${ex.name}</div>
+              <div class="awt-target">${ex.target}</div>
+            </div>
+            <a class="awt-form-link" href="${ex.gif}" target="_blank" rel="noopener">Form GIF</a>
+          </div>
+
+          <div class="awt-rec">${rec.text}</div>
+
+          <div class="awt-log-row">
+            <input class="awt-input awt-weight-input" type="number" inputmode="decimal" placeholder="${rec.weight != null ? 'Weight (lb) — e.g. ' + rec.weight : 'Weight (lb)'}">
+            <input class="awt-input awt-reps-input" type="number" inputmode="numeric" placeholder="Reps">
+            <button class="awt-log-btn">Log</button>
+          </div>
+
+          <div class="awt-history">
+            <button class="awt-history-toggle" data-ex="${ex.id}">${lastTxt} · view history</button>
+            <div class="awt-history-list-container" style="display:none;">
+              ${historyRowsHtml(log)}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    el.querySelectorAll('.awt-card').forEach(card => {
+      const exId = card.getAttribute('data-ex');
+      const weightInput = card.querySelector('.awt-weight-input');
+      const repsInput = card.querySelector('.awt-reps-input');
+      const logBtn = card.querySelector('.awt-log-btn');
+      const histToggle = card.querySelector('.awt-history-toggle');
+      const histContainer = card.querySelector('.awt-history-list-container');
+
+      logBtn.addEventListener('click', async () => {
+        const weight = parseFloat(weightInput.value);
+        if (!weight && weight !== 0) return;
+        const reps = repsInput.value ? parseInt(repsInput.value, 10) : null;
+        state.logs[exId] = state.logs[exId] || [];
+        state.logs[exId].push({ date: todayStr(), weight, reps });
+        await saveLog(exId);
+        weightInput.value = '';
+        repsInput.value = '';
+        renderList();
+      });
+
+      histToggle.addEventListener('click', () => {
+        const isOpen = histContainer.style.display !== 'none';
+        histContainer.style.display = isOpen ? 'none' : 'block';
+      });
+    });
+  }
+
+  async function init() {
+    renderWeekStrip();
+    document.getElementById('awt-back-btn').addEventListener('click', () => showView('home'));
+    await loadAllLogs();
+    showView('home');
+  }
+
+  init();
+})();
+</script>
