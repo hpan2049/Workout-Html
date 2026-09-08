@@ -476,8 +476,17 @@
     return Math.floor((d - start) / 86400000) + 1;
   }
 
+  // Formats a Date using its local calendar day, not UTC — avoids the
+  // date silently shifting by a day for evening sessions in US timezones.
+  function formatLocalDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   function todayStr() {
-    return new Date().toISOString().slice(0, 10);
+    return formatLocalDate(new Date());
   }
 
   // Standalone hosting: uses the browser's own localStorage instead of
@@ -527,7 +536,7 @@
     for (let i = 0; i < startWeekday; i++) cells += `<div class="awt-cal-cell"></div>`;
     for (let d = 1; d <= daysInMonth; d++) {
       const dateObj = new Date(year, month, d);
-      const dateStr = dateObj.toISOString().slice(0, 10);
+      const dateStr = formatLocalDate(dateObj);
       const isToday = dateStr === todayVal;
       const hasLog = loggedSet.has(dateStr);
       cells += `<div class="awt-cal-cell${isToday ? ' awt-cal-today' : ''}${hasLog ? ' awt-cal-logged' : ''}">${d}</div>`;
@@ -627,7 +636,7 @@
         const diff = entry.weight - prev.weight;
         if (diff > 0) delta = `<span class="awt-delta-up">+${diff} lb</span>`;
         else if (diff < 0) delta = `<span class="awt-delta-down">${diff} lb</span>`;
-        else delta = `<span>even</span>`;
+        else delta = '';
       }
       const repsTxt = entry.reps ? ` x ${entry.reps}` : '';
       return `<div class="awt-history-row"><span>${entry.date}</span><span>${entry.weight} lb${repsTxt} ${delta}</span></div>`;
@@ -684,7 +693,7 @@
         const diff = entry.seconds - prev.seconds;
         if (diff > 0) delta = `<span class="awt-delta-up">+${diff}s</span>`;
         else if (diff < 0) delta = `<span class="awt-delta-down">${diff}s</span>`;
-        else delta = `<span>even</span>`;
+        else delta = '';
       }
       return `<div class="awt-history-row"><span>${entry.date}</span><span>${entry.seconds}s ${delta}</span></div>`;
     }).join('');
