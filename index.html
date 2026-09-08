@@ -1,5 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Upper / Lower Plan</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #14171c;
+  }
 
   #awt-root {
     --bg: #14171c;
@@ -17,11 +30,10 @@
     background: var(--bg);
     color: var(--text);
     font-family: 'Inter', sans-serif;
+    width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    min-height: 100%;
-    border-radius: 18px;
-    overflow: hidden;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
   }
@@ -355,6 +367,8 @@
     padding: 0;
   }
 </style>
+</head>
+<body>
 
 <div id="awt-root">
   <div class="awt-header">
@@ -400,7 +414,7 @@
         { id: 'walking-lunge', name: 'Walking Lunges', target: '2 x 12/leg', gif: 'https://musclewiki.com/exercise/lunge-walking?model=f', step: 2.5 },
         { id: 'leg-press', name: 'Leg Press', target: '2 x 10-12', gif: 'https://musclewiki.com/exercise/machine-leg-press?model=f', step: 5 },
         { id: 'calf-raise-standing', name: 'Standing Calf Raise', target: '3 x 12-15', gif: 'https://musclewiki.com/exercise/machine-standing-calf-raises?model=f', step: 2.5 },
-        { id: 'core-a', name: 'Hanging Knee Raise or Plank', target: '2 x 12-15 / 30-45s', gif: 'https://musclewiki.com/exercise/hanging-knee-raises?model=f', step: 2.5 }
+        { id: 'core-a', name: 'Plank', target: '30-45s hold', gif: 'https://musclewiki.com/exercise/forearm-plank?model=f', type: 'time' }
       ]
     },
     {
@@ -435,6 +449,14 @@
 
   const state = { activeDay: 'upperA', logs: {}, view: 'home', calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1) };
   const logKey = (exId) => 'log:' + exId;
+
+  // Smallest weight jump available at her gym across barbells, dumbbells,
+  // and machines — used to round any weight the app calculates so it's
+  // always a plate combination that actually exists.
+  const PLATE_INCREMENT = 2.5;
+  function roundToIncrement(value, increment) {
+    return Math.round(value / increment) * increment;
+  }
 
   const ENCOURAGEMENT = [
     "Proud of you for building this into your week, Abby.",
@@ -615,30 +637,86 @@
     return `<div class="awt-history-list">${rows}</div>`;
   }
 
-  // Pulls the top of the target rep range out of a string like "3 x 8-10" -> 10
-  function parseTopRep(targetStr) {
+  // Pulls the low and high ends of a rep range out of a string like
+  // "3 x 8-10" -> {low: 8, high: 10}. Falls back to a single number when
+  // there's no range (e.g. "3 x 10/leg" -> {low: 10, high: 10}).
+  function parseRepRange(targetStr) {
     const match = targetStr.match(/(\d+)\s*-\s*(\d+)/);
-    if (match) return parseInt(match[2], 10);
+    if (match) return { low: parseInt(match[1], 10), high: parseInt(match[2], 10) };
     const single = targetStr.match(/x\s*(\d+)/i);
+    if (single) {
+      const n = parseInt(single[1], 10);
+      return { low: n, high: n };
+    }
+    return { low: null, high: null };
+  }
+
+  // Pulls the top of a time range out of a string like "30-45s hold" -> 45
+  function parseTopSeconds(targetStr) {
+    const match = targetStr.match(/(\d+)\s*-\s*(\d+)\s*s/);
+    if (match) return parseInt(match[2], 10);
+    const single = targetStr.match(/(\d+)\s*s/);
     return single ? parseInt(single[1], 10) : null;
   }
 
-  // Recommends a weight for today based only on the last logged session and
-  // how long ago it was — no target curve, just a simple next-session call.
-  function recommend(log, step, targetStr) {
+  // Recommends a hold time for today based on her last logged session.
+  function recommendTime(log, targetStr) {
+    const topSeconds = parseTopSeconds(targetStr);
     if (!log.length) {
-      return { text: `No sessions yet — start with a weight you can control for ${targetStr}, leaving 2 reps in the tank.`, weight: null };
+      return { text: `No sessions yet — aim for ${targetStr}, stopping a few seconds before your form breaks down.` };
     }
     const last = log[log.length - 1];
     const daysSince = Math.floor((new Date(todayStr()) - new Date(last.date)) / 86400000);
-    const topRep = parseTopRep(targetStr);
+
+    if (daysSince > 10) {
+      return { text: `It's been ${daysSince} days — ease back in around ${last.seconds}s.` };
+    }
+    if (topSeconds != null && last.seconds >= topSeconds) {
+      return { text: `Held the top of her range last time — try adding 5-10s today.` };
+    }
+    return { text: `Last held ${last.seconds}s — aim to match or beat that today.` };
+  }
+
+  function timeHistoryRowsHtml(log) {
+    if (!log.length) return '<div class="awt-empty-hist">No sessions logged yet.</div>';
+    const rows = [...log].slice(-5).reverse().map((entry, idx, arr) => {
+      const prev = arr[idx + 1];
+      let delta = '';
+      if (prev) {
+        const diff = entry.seconds - prev.seconds;
+        if (diff > 0) delta = `<span class="awt-delta-up">+${diff}s</span>`;
+        else if (diff < 0) delta = `<span class="awt-delta-down">${diff}s</span>`;
+        else delta = `<span>even</span>`;
+      }
+      return `<div class="awt-history-row"><span>${entry.date}</span><span>${entry.seconds}s ${delta}</span></div>`;
+    }).join('');
+    return `<div class="awt-history-list">${rows}</div>`;
+  }
+
+  // Recommends a weight for today using double progression: build reps up
+  // to the top of the target range first, then add weight and drop reps
+  // back down, rather than adding weight every session.
+  function recommend(log, step, targetStr) {
+    const { low, high } = parseRepRange(targetStr);
+    if (!log.length) {
+      const lowTxt = low != null ? `about ${low} reps` : 'the bottom of her range';
+      const highTxt = high != null ? high : 'the top of her range';
+      return { text: `No sessions yet — start with a weight you can control for ${lowTxt}, and build toward ${highTxt} reps before adding weight.`, weight: null };
+    }
+    const last = log[log.length - 1];
+    const daysSince = Math.floor((new Date(todayStr()) - new Date(last.date)) / 86400000);
 
     if (daysSince > 10) {
       return { text: `It's been ${daysSince} days — ease back in at ${last.weight} lb.`, weight: last.weight };
     }
-    if (last.reps != null && topRep != null && last.reps >= topRep) {
-      const next = last.weight + step;
-      return { text: `Hit the top of her range last time — try ${next} lb today.`, weight: next };
+    if (last.reps != null && high != null && last.reps >= high) {
+      const next = roundToIncrement(last.weight + step, PLATE_INCREMENT);
+      const lowTxt = low != null ? `back toward ${low}` : 'back down';
+      return { text: `Hit ${high} reps at ${last.weight} lb last time — bump up to ${next} lb today. Reps will likely drop ${lowTxt} at the new weight, and that's expected.`, weight: next };
+    }
+    if (last.reps != null && high != null) {
+      const nextReps = Math.min(last.reps + 1, high);
+      return { text: `Stick with ${last.weight} lb and aim for ${nextReps} reps today (last time: ${last.reps}).`, weight: last.weight };
     }
     return { text: `Stick with ${last.weight} lb and aim for a rep or two more before adding weight.`, weight: last.weight };
   }
@@ -650,11 +728,29 @@
     el.innerHTML = day.exercises.map(ex => {
       const log = state.logs[ex.id] || [];
       const last = log[log.length - 1];
-      const lastTxt = last ? `Last: ${last.weight} lb${last.reps ? ' x ' + last.reps : ''} on ${last.date}` : 'No sessions logged yet';
-      const rec = recommend(log, ex.step, ex.target);
+      const isTime = ex.type === 'time';
+
+      const lastTxt = isTime
+        ? (last ? `Last: ${last.seconds}s on ${last.date}` : 'No sessions logged yet')
+        : (last ? `Last: ${last.weight} lb${last.reps ? ' x ' + last.reps : ''} on ${last.date}` : 'No sessions logged yet');
+
+      const rec = isTime ? recommendTime(log, ex.target) : recommend(log, ex.step, ex.target);
+
+      const logRowHtml = isTime
+        ? `<div class="awt-log-row">
+             <input class="awt-input awt-seconds-input" type="number" inputmode="numeric" placeholder="Seconds held">
+             <button class="awt-log-btn">Log</button>
+           </div>`
+        : `<div class="awt-log-row">
+             <input class="awt-input awt-weight-input" type="number" inputmode="decimal" placeholder="${rec.weight != null ? 'Weight (lb) — e.g. ' + rec.weight : 'Weight (lb)'}">
+             <input class="awt-input awt-reps-input" type="number" inputmode="numeric" placeholder="Reps">
+             <button class="awt-log-btn">Log</button>
+           </div>`;
+
+      const historyHtml = isTime ? timeHistoryRowsHtml(log) : historyRowsHtml(log);
 
       return `
-        <div class="awt-card" data-ex="${ex.id}">
+        <div class="awt-card" data-ex="${ex.id}" data-type="${isTime ? 'time' : 'weight'}">
           <div class="awt-card-top">
             <div>
               <div class="awt-name">${ex.name}</div>
@@ -665,16 +761,12 @@
 
           <div class="awt-rec">${rec.text}</div>
 
-          <div class="awt-log-row">
-            <input class="awt-input awt-weight-input" type="number" inputmode="decimal" placeholder="${rec.weight != null ? 'Weight (lb) — e.g. ' + rec.weight : 'Weight (lb)'}">
-            <input class="awt-input awt-reps-input" type="number" inputmode="numeric" placeholder="Reps">
-            <button class="awt-log-btn">Log</button>
-          </div>
+          ${logRowHtml}
 
           <div class="awt-history">
             <button class="awt-history-toggle" data-ex="${ex.id}">${lastTxt} · view history</button>
             <div class="awt-history-list-container" style="display:none;">
-              ${historyRowsHtml(log)}
+              ${historyHtml}
             </div>
           </div>
         </div>
@@ -683,23 +775,37 @@
 
     el.querySelectorAll('.awt-card').forEach(card => {
       const exId = card.getAttribute('data-ex');
-      const weightInput = card.querySelector('.awt-weight-input');
-      const repsInput = card.querySelector('.awt-reps-input');
+      const isTime = card.getAttribute('data-type') === 'time';
       const logBtn = card.querySelector('.awt-log-btn');
       const histToggle = card.querySelector('.awt-history-toggle');
       const histContainer = card.querySelector('.awt-history-list-container');
 
-      logBtn.addEventListener('click', async () => {
-        const weight = parseFloat(weightInput.value);
-        if (!weight && weight !== 0) return;
-        const reps = repsInput.value ? parseInt(repsInput.value, 10) : null;
-        state.logs[exId] = state.logs[exId] || [];
-        state.logs[exId].push({ date: todayStr(), weight, reps });
-        await saveLog(exId);
-        weightInput.value = '';
-        repsInput.value = '';
-        renderList();
-      });
+      if (isTime) {
+        const secondsInput = card.querySelector('.awt-seconds-input');
+        logBtn.addEventListener('click', async () => {
+          const seconds = parseInt(secondsInput.value, 10);
+          if (!seconds && seconds !== 0) return;
+          state.logs[exId] = state.logs[exId] || [];
+          state.logs[exId].push({ date: todayStr(), seconds });
+          await saveLog(exId);
+          secondsInput.value = '';
+          renderList();
+        });
+      } else {
+        const weightInput = card.querySelector('.awt-weight-input');
+        const repsInput = card.querySelector('.awt-reps-input');
+        logBtn.addEventListener('click', async () => {
+          const weight = parseFloat(weightInput.value);
+          if (!weight && weight !== 0) return;
+          const reps = repsInput.value ? parseInt(repsInput.value, 10) : null;
+          state.logs[exId] = state.logs[exId] || [];
+          state.logs[exId].push({ date: todayStr(), weight, reps });
+          await saveLog(exId);
+          weightInput.value = '';
+          repsInput.value = '';
+          renderList();
+        });
+      }
 
       histToggle.addEventListener('click', () => {
         const isOpen = histContainer.style.display !== 'none';
@@ -718,3 +824,5 @@
   init();
 })();
 </script>
+</body>
+</html>
